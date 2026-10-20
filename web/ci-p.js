@@ -323,7 +323,7 @@
   }
   $('o-sample').onclick = () => {
     Object.assign($('o-type'), { value: 'ratio' })
-    $('o-est').value = '1.37'; $('o-lo').value = '1.05'; $('o-hi').value = '1.83'; $('o-level').value = '95'; $('o-p').value = '0.21'
+    $('o-est').value = '1.24'; $('o-lo').value = '1.02'; $('o-hi').value = '1.51'; $('o-level').value = '95'; $('o-p').value = '0.21'
     $('o-run').click()
   }
 
