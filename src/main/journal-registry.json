@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 2,
+  "records": [
+    { "id": "wcjd", "zh": "世界华人消化杂志", "en": "World Chinese Journal of Digestology", "issn": ["2219-2859"], "doiPrefixes": ["10.11569"] },
+    { "id": "cjm", "zh": "中国微生态学杂志", "en": "Chinese Journal of Microecology", "issn": [], "doiPrefixes": ["10.13381/j.cnki.cjm"] },
+    { "id": "zhxh", "zh": "中华消化杂志", "en": "Chinese Journal of Digestion", "issn": [], "doiPrefixes": ["10.3760/cma"] },
+    { "id": "zhcrb", "zh": "中华传染病杂志", "en": "Chinese Journal of Infectious Diseases", "issn": [], "doiPrefixes": ["10.3760/cma"] },
+    { "id": "lcxh", "zh": "临床消化病杂志", "en": "", "issn": [], "doiPrefixes": ["10.3870/lcxh.j.issn.1005-541X"] },
+    { "id": "zgxdyx", "zh": "中国现代医学杂志", "en": "China Journal of Modern Medicine", "issn": [], "doiPrefixes": ["10.3969/j.issn.1005-8982"] },
+    { "id": "zwyl", "zh": "中外医疗", "en": "China Foreign Medical Treatment", "issn": [], "doiPrefixes": ["10.16662/j.cnki.1674-0742"] },
+    { "id": "zhnkx", "zh": "中华男科学杂志", "en": "National Journal of Andrology", "issn": [], "doiPrefixes": ["10.13263/j.cnki.nja"] },
+    { "id": "lcek", "zh": "临床儿科杂志", "en": "Journal of Clinical Pediatrics", "issn": [], "doiPrefixes": ["10.3969/j.issn.1000-3606"] },
+    { "id": "gjmnxt", "zh": "国际泌尿系统杂志", "en": "International Journal of Urology and Nephrology", "issn": [], "doiPrefixes": ["10.3760/cma"] },
+    { "id": "xhyxzz", "zh": "协和医学杂志", "en": "Medical Journal of Peking Union Medical College Hospital", "issn": [], "doiPrefixes": ["10.12290"] },
+    { "id": "xzykdx", "zh": "徐州医科大学学报", "en": "Journal of Xuzhou Medical University", "issn": [], "doiPrefixes": ["10.3969/j.issn.2096-3882"] },
+    { "id": "zhnk", "zh": "中华内科杂志", "en": "Chinese Journal of Internal Medicine", "issn": [], "doiPrefixes": ["10.3760/cma"] },
+    { "id": "wswxb", "zh": "微生物学报", "en": "Acta Microbiologica Sinica", "issn": [], "doiPrefixes": ["10.13343/j.cnki.wsxb"] },
+    { "id": "zgyydb", "zh": "中国医药导报", "en": "China Medical Herald", "issn": [], "doiPrefixes": ["10.20047"] },
+    { "id": "zhtnb", "zh": "中华糖尿病杂志", "en": "Chinese Journal of Diabetes Mellitus", "issn": [], "doiPrefixes": ["10.3760/cma"] },
+    { "id": "yxzs", "zh": "医学综述", "en": "Medical Recapitulate", "issn": [], "doiPrefixes": ["10.3969/j.issn.1006-2084"] },
+    { "id": "zxyjhxnxgb", "zh": "中西医结合心脑血管病杂志", "en": "Chinese Journal of Integrative Medicine on Cardio-/Cerebrovascular Disease", "issn": [], "doiPrefixes": ["10.3969/j.issn.1672-1349"] },
+    { "id": "xxgkf", "zh": "心血管康复医学杂志", "en": "Chinese Journal of Cardiovascular Rehabilitation Medicine", "issn": [], "doiPrefixes": ["10.3969/j.issn.1008-0074"] },
+    { "id": "zgjrxzb", "zh": "中国介入心脏病学杂志", "en": "Chinese Journal of Interventional Cardiology", "issn": [], "doiPrefixes": ["10.3969/j.issn.1004-8812"] },
+    { "id": "zgmkyx", "zh": "中国民康医学", "en": "Medical Journal of Chinese People's Health", "issn": [], "doiPrefixes": ["10.3969/j.issn.1672-0369"] },
+    { "id": "zgwsjj", "zh": "中国卫生经济", "en": "Chinese Health Economics", "issn": [], "doiPrefixes": ["10.3969/j.issn.1003-0743"] }
+  ]
+}
