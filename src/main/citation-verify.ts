@@ -469,8 +469,14 @@ export async function verifyEntry(entry: string, deps: {
   searchNearYear?: (entry: string, year: number, rows?: number, signal?: AbortSignal) => Promise<unknown[]>
 }, signal?: AbortSignal, hints?: EntryHints): Promise<CitationItemData> {
   const identifier = extractIdentifier(entry)
+  /*
+   * When a record fetched by DOI carries no DOI, fill in that DOI (see withSameWorkValues): the record was
+   * fetched with it. Records fetched by PMID get that PMID the same way. Otherwise the field-by-field comparison
+   * would report the DOI as not checked (for example, a PubMed summary that does not list the DOI).
+   */
   let result = identifier
-    ? judgeCitation(entry, await deps.lookup(identifier, signal), hints)
+    ? judgeCitation(entry, withSameWorkValues(await deps.lookup(identifier, signal), /^10\.\d{4,9}\//.test(identifier)
+      ? { doi: identifier } : { pmid: identifier }), hints)
     : await judgeUnidentifiedEntry(entry, deps, signal, hints)
   /*
    * When the DOI is not found, or it points to another real article (the identifier exists but the
@@ -502,7 +508,7 @@ export async function verifyEntry(entry: string, deps: {
           // identifier.
           // Issue is not compared: supplement notation varies (manuscript "Suppl 1", PubMed "1 Suppl 1").
           const judged = lookup.found
-            ? judgeCitation(entry, withLookupDoi(lookup, neighbor.doi), hints)
+            ? judgeCitation(entry, withSameWorkValues(lookup, { doi: neighbor.doi, candidate: neighbor }), hints)
             : null
           if (judged && lookup.found && judged.identityMatch?.journal !== 'differs'
             && neighborLocatorAgrees(entry, parseWithHints(entry, hints), lookup.record)) byTitle = judged
@@ -537,13 +543,33 @@ export async function verifyEntry(entry: string, deps: {
 }
 
 /**
- * A PubMed record retrieved by DOI sometimes lacks the DOI (ESummary often omits it for older papers).
- * The record was fetched with this identifier, so it belongs to it; fill it in, otherwise "DOI is
- * wrong" cannot give the correct identifier.
+ * A PubMed record fetched by DOI sometimes carries no DOI (ESummary often lacks it for older papers).
+ * The record was fetched with this identifier, so it belongs to the record; fill it in, or a wrong-DOI
+ * report could not give the correct one.
+ *
+ * If any source has a value, do not report the field as not checked: likewise fill in the PMID used for the
+ * lookup, and the volume, issue and pages recorded by the candidate that was identified as the same work
+ * (title matched) when this record lacks them. Only empty fields are filled; the record's own values are
+ * never overwritten, and no new lookups are made.
  */
-function withLookupDoi(lookup: PubmedLookup, doi: string): PubmedLookup {
-  if (!lookup.found || lookup.record.doi) return lookup
-  return { ...lookup, record: { ...lookup.record, doi } }
+export function withSameWorkValues(lookup: PubmedLookup, from: {
+  doi?: string | null
+  pmid?: string | null
+  candidate?: Pick<Candidate, 'doi' | 'volume' | 'issue' | 'pages'> | null
+}): PubmedLookup {
+  if (!lookup.found) return lookup
+  const record = lookup.record
+  const filled = (own: string | null | undefined, other: string | null | undefined) => (own?.trim() ? own : other?.trim() ? other.trim() : own)
+  const next = {
+    ...record,
+    doi: filled(record.doi, from.doi ?? from.candidate?.doi) ?? null,
+    pmid: filled(record.pmid, from.pmid) ?? '',
+    volume: filled(record.volume, from.candidate?.volume) ?? record.volume,
+    issue: filled(record.issue, from.candidate?.issue) ?? record.issue,
+    pages: filled(record.pages, from.candidate?.pages) ?? record.pages,
+  }
+  const changed = (['doi', 'pmid', 'volume', 'issue', 'pages'] as const).some((field) => next[field] !== record[field])
+  return changed ? { ...lookup, record: next } : lookup
 }
 
 /**
@@ -608,7 +634,7 @@ async function judgeUnidentifiedEntry(
   if (matched?.doi && anchored) {
     try {
       const lookup = await deps.lookup(matched.doi, signal)
-      if (lookup.found) return judgeCitation(entry, withLookupDoi(lookup, matched.doi), hints)
+      if (lookup.found) return judgeCitation(entry, withSameWorkValues(lookup, { doi: matched.doi, candidate: matched }), hints)
     } catch (error) {
       if (signal?.aborted) throw error
     }

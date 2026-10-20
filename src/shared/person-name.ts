@@ -239,3 +239,51 @@ export function comparePersons(declared: string, found: string): FieldCompareRes
     why: missing.length === left.names.length ? `记录里没有 ${missing.length} 位稿件所列作者` : `记录里没有其中 ${missing.length} 位稿件所列作者`,
   }
 }
+
+/**
+ * Same person, but the record lists one fewer given-name initial than the manuscript (`Hartgerink CH` vs
+ * `Hartgerink CHJ`, `Lam FC` vs `Lam F. C. W.`). We cannot tell whether the database dropped it or the
+ * manuscript added one, so this is neither reported as wrong nor as matching (it is recorded as not checked).
+ * The shared `samePerson` is not relaxed: an extra initial must not be swallowed as a record omission.
+ */
+export function recordHasOneFewerInitial(declared: string, found: string): boolean {
+  const left = personParts(declared)
+  const right = personParts(found)
+  if (left.cjk || right.cjk || !left.words.size || left.words.size !== right.words.size) return false
+  for (const word of left.words) if (!right.words.has(word)) return false
+  // Compare the initials in order: the record's string is the manuscript's minus its last letter. `CH` vs `CHJ`
+  // qualifies, `CH` vs `CK` does not (a set of initials would mix in the surname's H and make `CK` look like one fewer).
+  const declaredInitials = givenInitials(declared)
+  const foundInitials = givenInitials(found)
+  return declaredInitials.length === foundInitials.length + 1 && declaredInitials.startsWith(foundInitials)
+}
+
+/**
+ * The given-name initials of a name, in order: `Lam F. C. W.` → `fcw`, `Hartgerink CHJ` → `chj`.
+ * An all-caps surname (GB/T style) does not count.
+ */
+function givenInitials(name: string): string {
+  const tokens = name.replace(/[.,]/g, ' ').replace(/[-\u2010\u2011–—]/g, ' ').trim().split(/\s+/).filter(Boolean)
+  const surnameFirst = tokens.length >= 2 && tokens.every((token) => /^[A-Z]{1,3}$/.test(token)) && tokens[0]!.length >= 2
+  return tokens.filter((token, index) => /^[A-Z]{1,3}$/.test(token) && !(surnameFirst && index === 0)).join('').toLowerCase()
+}
+
+/**
+ * Every author lines up position by position, and the only differences are records that list one fewer
+ * initial (`recordHasOneFewerInitial`). The lists must be the same length; when the manuscript truncates with
+ * et al., only the authors it writes out are compared.
+ */
+export function authorsDifferOnlyByRecordInitials(declared: string, found: string): boolean {
+  const left = splitPersons(declared)
+  const right = splitPersons(found)
+  if (!left.names.length || left.names.length > right.names.length) return false
+  if (left.names.length < right.names.length && !left.truncated) return false
+  let fewer = 0
+  for (const [index, name] of left.names.entries()) {
+    const other = right.names[index]!
+    if (samePerson(name, other)) continue
+    if (!recordHasOneFewerInitial(name, other)) return false
+    fewer += 1
+  }
+  return fewer > 0
+}

@@ -11,7 +11,7 @@
  */
 import type { ParsedEntry } from '../../main/citation-match'
 import { compareReferenceField, type FieldCompareKind } from '../../shared/reference-field-compare'
-import { GROUP_AUTHOR, personParts, samePerson, splitPersons } from '../../shared/person-name'
+import { GROUP_AUTHOR, recordHasOneFewerInitial, samePerson, splitPersons } from '../../shared/person-name'
 
 export type CheckedField = 'authors' | 'title' | 'journal' | 'year' | 'volume' | 'issue' | 'pages'
 
@@ -124,12 +124,7 @@ type PersonMatch = 'same' | 'fewer-initials' | null
  */
 function matchPerson(declared: string, found: string): PersonMatch {
   if (samePerson(declared, found)) return 'same'
-  const left = personParts(declared)
-  const right = personParts(found)
-  if (left.cjk || right.cjk || !left.words.size || left.words.size !== right.words.size) return null
-  for (const word of left.words) if (!right.words.has(word)) return null
-  for (const initial of right.initials) if (!left.initials.has(initial)) return null
-  return left.initials.size - right.initials.size === 1 ? 'fewer-initials' : null
+  return recordHasOneFewerInitial(declared, found) ? 'fewer-initials' : null
 }
 
 /**
